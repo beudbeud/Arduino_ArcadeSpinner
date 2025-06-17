@@ -54,7 +54,7 @@ GP_6    Button4
 
 1. Install Aduino IDE 2.x
 2. Open Arduino_ArcadeSpinner.ino
-3. Install (HID-Project)[https://github.com/NicoHood/HID] library
+3. Install [HID-Project](https://github.com/NicoHood/HID) library
 3. Connect your Arduino pro micro to your computer
 4. Select Arduino Leonardo with the correct com port
 5. Flash the controller
