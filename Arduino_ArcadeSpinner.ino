@@ -48,7 +48,9 @@
 
 ////////////////////////////////////////////////////////
 
-#include "HID-Project.h"
+#include <HID-Project.h>
+#define MOUSE_SIDE      (1 << 3)
+#define MOUSE_EXTRA     (1 << 4)
 
 // Default virtual spinner position
 int16_t drvpos = 0;
@@ -125,8 +127,8 @@ void loop()
     { Button0, MOUSE_LEFT },
     { Button1, MOUSE_RIGHT },
     { Button2, MOUSE_MIDDLE },
-    { Button3, MOUSE_PREV },
-    { Button4, MOUSE_NEXT },
+    { Button3, MOUSE_EXTRA },
+    { Button4, MOUSE_SIDE },
   };
 
   for(const ButtonMapper& mapper : buttonsToMouseButtons)
