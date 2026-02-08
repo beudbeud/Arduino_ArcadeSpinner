@@ -62,13 +62,13 @@ B           →    Pin 3 (GP_3)
 
 **Boutons :**
 ```
-Fonction          →    Pin Arduino    →    Bouton souris
-──────────────────────────────────────────────────────────
-Button0 (Gauche)  →    Pin 5 (GP_5)   →    Clic gauche
-Button1 (Droit)   →    Pin 4 (GP_4)   →    Clic droit
-Button2 (Start)   →    Pin 14 (GP_14) →    Clic milieu
-Button3 (Hotkey)  →    Pin 15 (GP_15) →    Bouton extra
-Button4 (Select)  →    Pin 6 (GP_6)   →    Bouton latéral
+Fonction          →    Pin Arduino    
+─────────────────────────────────────
+Button0 (B)  →    Pin 5 (GP_5)   
+Button1 (A)   →    Pin 4 (GP_4)   
+Button4 (Select)  →    Pin 6 (GP_6)   
+Button3 (Hotkey)  →    Pin 15 (GP_15) 
+Button2 (Start)   →    Pin 14 (GP_14) 
 ```
 **Schéma de connexion des boutons :**
 ```
