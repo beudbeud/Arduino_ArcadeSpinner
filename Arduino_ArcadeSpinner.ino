@@ -1,27 +1,27 @@
-/*  
+/*
  *  Arduino USB Arcade Spinner
  *  (C) Adrien Beudin [https://github.com/beudbeud]
- *  
+ *
  *  Based on project by Alexey Melnikov [https://github.com/MiSTer-devel/Retro-Controllers-USB-MiSTer/blob/master/PaddleTwoControllersUSB/PaddleTwoControllersUSB.ino]
  *  Based on project by Mikael Norrgård <mick@daemonbite.com>
  *  Based on project [https://github.com/willoucom/Arduino_ArcadeSpinner]
  *
  *  GNU GENERAL PUBLIC LICENSE
  *  Version 3, 29 June 2007
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 ///////////////// Customizable settings /////////////////////////
@@ -29,8 +29,9 @@
 #define SPINNER_PPR 600
 
 // Spinner/Mouse sensitivity
-// 1 is more sensitive 
+// 1 is more sensitive
 // 999 is less sensitive
+#define DEFAULT_SENSITIVITY 1
 #define SPINNER_SENSITIVITY 500
 #define MOUSE_SENSITIVITY 5
 
@@ -40,11 +41,11 @@
 #define pinA 2
 #define pinB 3
 // Pins used by buttons
-#define Button0 5 // Left button
-#define Button1 4 // Right button
-#define Button2 14 // Middle
-#define Button3 15 // Middle
-#define Button4 6 // Middle
+#define Button0 5 // Left button B
+#define Button1 4 // Right button A
+#define Button2 14 // Start
+#define Button3 15 // Hotkey
+#define Button4 6 // Select
 
 ////////////////////////////////////////////////////////
 
@@ -76,12 +77,12 @@ void drv_proc()
   int8_t spval = (b << 1) | (b^a);
   int8_t diff = (prev - spval)&3;
 
-  if(diff == 1) 
+  if(diff == 1)
   {
     r_drvpos += 1;
     if(sp_clamp < SP_MAX) sp_clamp++;
   }
-  if(diff == 3) 
+  if(diff == 3)
   {
     r_drvpos -= 1;
     if(sp_clamp > 0) sp_clamp--;
