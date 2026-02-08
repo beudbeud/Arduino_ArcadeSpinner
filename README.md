@@ -1,60 +1,131 @@
-# Arduino_ArcadeSpinner
+# Arduino Arcade Spinner
 
-This project is a modern re-creation of the spinners used in arcades, mainly for brick-breakers like arkanoid for example.
+Ce projet est une recréation moderne des spinners utilisés dans les bornes d'arcade, principalement pour les casse-briques comme Arkanoid.
 
-The objective is to offer a feeling close to the original equipment by using components that are easy to obtain.
+L'objectif est d'offrir une sensation proche de l'équipement d'origine en utilisant des composants faciles à obtenir.
 
-## Usage
+![Spinner](img/front.jpg)
+![Spinner](img/front2.jpg)
+![Spinner](img/back.jpg)
 
-By default the device operate as a 5 button controller with Spinner
+## Utilisation
 
-## Build yourself
+Par défaut, l'appareil fonctionne comme un contrôleur à 5 boutons avec spinner, émulant une souris USB.
 
-### Parts 
+**Fonctionnalités :**
+- Spinner haute précision (600 PPR par défaut)
+- 5 boutons mappés sur les boutons de souris (gauche, droit, milieu, latéral, extra)
+- Sensibilité ajustable via le code
+- Compatibilité universelle (Windows, Linux, MacOS, RetroPie, MiSTer, etc.)
 
-- Rotary encoder (Model: C38S6G5-600B-G24N)
-- 40mm Knob with internal diameter of 6mm 
-- Arduino Pro Micro
-- 3 24mm button
-- 2 30mm button
-- Enclosure 3D printed or any box
+## Construire le vôtre
 
-#### Prepare the rotary encoder
+### Liste des composants
 
-![Img!](img/encoder.jpg "rotary encoder")
+| Composant | Modèle recommandé | Quantité |
+|-----------|-------------------|----------|
+| Encodeur rotatif | C38S6G5-600B-G24N (600 PPR) | 1 |
+| Microcontrôleur | Arduino | 1 |
+| Boutons 24mm | Standard arcade | 3 |
+| Boutons 30mm | Standard arcade | 2 |
+| Boîtier | Imprimé 3D ou boîte quelconque | 1 |
+| Câbles | Dupont ou fils de connexion | - |
 
-1. Remove the metal enclosure and extract the mechanism.
-2. Unsolder all wires.
-3. Solder fresh wires on GND, VCC, A and B pads.
-4. Recycle the original metal case and wire for another project.
 
-### Arduino Pinout
+**Où acheter :**
+- Encodeur rotatif : [AliExpress](https://fr.aliexpress.com/item/1005004359395872.html), Amazon (chercher "600PPR rotary encoder")
+- Arduino Pro Micro : [AliExpress](https://fr.aliexpress.com/item/1005006734882677.html), [Amazon](https://www.amazon.fr/d%C3%A9veloppement-Binghe-Microcontr%C3%B4leurs-Interfaces-Compatible/dp/B0D69JLJ97), boutiques électronique
+- Boutons arcade : [Boutiques spécialisées arcade](https://www.smallcab.net/boutons-c-30_35.html) ou AliExpress
 
-![Img!](img/arduino.jpg "Arduino")
+### Schéma de câblage Arduino
 
-The buttons must be grounded, you can create a daisy chain to use a common GND for your 4 buttons, you can solder the buttons or use wire connectors.
+![Pinout Arduino](img/arduino.jpg)
 
-Bridge pad J1 to send +5v to encoder instead of 3.3v
+Les boutons doivent être connectés à la masse (GND). Vous pouvez créer une chaîne pour utiliser un GND commun pour tous vos boutons. Utilisez de la soudure ou des connecteurs de fils.
 
+**⚠️ Important :** Faites le pont sur le pad J1 pour envoyer +5V à l'encodeur au lieu de 3.3V
+
+![Pinout J1](img/j1.jpg)
+
+#### Connexions détaillées
+
+**Encodeur rotatif :**
 ```
-Encoder
-GND     GND
-VCC     VCC
-GP_3    A
-GP_2    B
-
-Buttons
-GP_5    Button0
-GP_4    Button1
-GP_15   Button2
-GP_14   Button3
-GP_6    Button4
+Encodeur    →    Arduino Pro Micro
+────────────────────────────────────
+GND         →    GND
+VCC         →    VCC (bridger J1 pour 5V)
+A           →    Pin 2 (GP_2)
+B           →    Pin 3 (GP_3)
 ```
-### Flash your Arduino
+![Pinout Rotary](img/rotary.jpg)
 
-1. Install Aduino IDE 2.x
-2. Open Arduino_ArcadeSpinner.ino
-3. Install [HID-Project](https://github.com/NicoHood/HID) library
-3. Connect your Arduino pro micro to your computer
-4. Select Arduino Leonardo with the correct com port
-5. Flash the controller
+**Boutons :**
+```
+Fonction          →    Pin Arduino    →    Bouton souris
+──────────────────────────────────────────────────────────
+Button0 (Gauche)  →    Pin 5 (GP_5)   →    Clic gauche
+Button1 (Droit)   →    Pin 4 (GP_4)   →    Clic droit
+Button2 (Start)   →    Pin 14 (GP_14) →    Clic milieu
+Button3 (Hotkey)  →    Pin 15 (GP_15) →    Bouton extra
+Button4 (Select)  →    Pin 6 (GP_6)   →    Bouton latéral
+```
+**Schéma de connexion des boutons :**
+```
+Relier toutes les masses → GND
+```
+![Pinout Rotary](img/final.jpg)
+
+## Flasher votre Arduino
+
+### Étape 1 : Installer Arduino IDE
+
+1. Télécharger [Arduino IDE 2.x](https://www.arduino.cc/en/software)
+2. Installer l'IDE sur votre ordinateur
+3. Lancer Arduino IDE
+
+### Étape 2 : Installer la bibliothèque HID-Project
+
+1. Aller dans **Sketch** → **Include Library** → **Manage Libraries**
+2. Rechercher "HID-Project"
+3. Installer la bibliothèque
+
+### Étape 3 : Configurer la carte
+
+1. Connecter votre **Arduino Pro Micro** à l'ordinateur via USB
+2. Dans Arduino IDE :
+   - **Outils** → **Type de carte** → Sélectionner **Arduino Leonardo**
+   - **Outils** → **Port** → Sélectionner le port COM correct
+
+**Note :** L'Arduino Pro Micro utilise le même bootloader que le Leonardo.
+
+### Étape 4 : Téléverser le code
+
+1. Ouvrir le fichier `Arduino_ArcadeSpinner.ino`
+2. Ajuster les paramètres de sensibilité si nécessaire (voir section Configuration)
+3. Cliquer sur **Téléverser** (flèche →)
+4. Attendre la compilation et le téléversement
+
+## Licence
+
+Ce projet est sous licence GNU General Public License v3.0.
+
+Basé sur les travaux de :
+- Adrien Beudin ([beudbeud](https://github.com/beudbeud))
+- Alexey Melnikov ([MiSTer-devel](https://github.com/MiSTer-devel))
+- Mikael Norrgård (mick@daemonbite.com)
+- [willoucom](https://github.com/willoucom/Arduino_ArcadeSpinner)
+
+## Contributions
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+- Ouvrir des issues pour signaler des bugs
+- Proposer des améliorations via pull requests
+- Partager vos builds et configurations
+
+## Ressources supplémentaires
+
+- [Documentation HID-Project](https://github.com/NicoHood/HID)
+- [Arduino Pro Micro Guide](https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide)
+- [MAME Configuration Guide](https://docs.mamedev.org/)
+- [Forum Arcade Controls](http://forum.arcadecontrols.com/)
