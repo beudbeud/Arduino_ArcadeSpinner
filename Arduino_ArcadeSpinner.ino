@@ -38,8 +38,8 @@
 /////////////////////////////////////////////////////////////////
 
 // Pins used by encoder
-#define pinA 2
-#define pinB 3
+#define pinA 3
+#define pinB 2
 // Pins used by buttons
 #define Button0 5 // Left button B
 #define Button1 4 // Right button A

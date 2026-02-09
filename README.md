@@ -53,10 +53,10 @@ Les boutons doivent être connectés à la masse (GND). Vous pouvez créer une c
 ```
 Encodeur    →    Arduino Pro Micro
 ────────────────────────────────────
-GND         →    GND
-VCC         →    VCC (bridger J1 pour 5V)
-A           →    Pin 2 (GP_2)
-B           →    Pin 3 (GP_3)
+GND (fil noir)  →    GND
+VCC (fil rouge) →    VCC (bridger J1 pour 5V)
+A (fil blanc)   →    Pin 2 (GP_2)
+B (fil green)   →    Pin 3 (GP_3)
 ```
 ![Pinout Rotary](img/rotary.jpg)
 
@@ -64,11 +64,11 @@ B           →    Pin 3 (GP_3)
 ```
 Fonction          →    Pin Arduino    
 ─────────────────────────────────────
-Button0 (B)  →    Pin 5 (GP_5)   
-Button1 (A)   →    Pin 4 (GP_4)   
-Button4 (Select)  →    Pin 6 (GP_6)   
-Button3 (Hotkey)  →    Pin 15 (GP_15) 
-Button2 (Start)   →    Pin 14 (GP_14) 
+Button0 (B)      →    Pin 5 (GP_5)   
+Button1 (A)      →    Pin 4 (GP_4)   
+Button4 (Select) →    Pin 6 (GP_6)   
+Button3 (Hotkey) →    Pin 15 (GP_15) 
+Button2 (Start)  →    Pin 14 (GP_14) 
 ```
 **Schéma de connexion des boutons :**
 ```
