@@ -25,127 +25,176 @@
  */
 
 ///////////////// Customizable settings /////////////////////////
-// Spinner pulses per revolution
-#define SPINNER_PPR 600
 
-// Spinner/Mouse sensitivity
-// 1 is more sensitive
-// 999 is less sensitive
-#define DEFAULT_SENSITIVITY 1
-#define SPINNER_SENSITIVITY 500
-#define MOUSE_SENSITIVITY 5
+// Your encoder's PPR (Pulses Per Revolution)
+// Common values: 300, 360, 400, 600
+// Quadrature encoding multiplies this by 4 (600 PPR = 2400 counts)
+#define ENCODER_PPR 600
+#define ENCODER_COUNTS (ENCODER_PPR * 4)  // 2400 for 600 PPR encoder
+
+/*
+ * Game Profiles - Based on original arcade hardware PPR
+ *
+ * Profile 0: Omega Race   - 64 PPR (Sega standard)
+ * Profile 1: Tempest      - 72 PPR (Atari vector standard)
+ * Profile 2: Tron/DoT     - 128 PPR
+ * Profile 3: Blasteroids  - 288 PPR
+ * Profile 4: Arkanoid     - 486 PPR (geared, very sensitive)
+ *
+ * Sensitivity = ENCODER_COUNTS / GAME_PPR
+ * Lower value = more sensitive (fewer encoder counts per game unit)
+ */
+
+#define NUM_PROFILES 5
+
+// Original game PPR values
+const uint16_t GAME_PPR[NUM_PROFILES] = {
+  64,
+  72,
+  128,
+  288,
+  486
+};
+
+// Pre-calculated sensitivity divisors: ENCODER_COUNTS / GAME_PPR
+// These values divide the raw encoder count to match original game feel
+const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
+  ENCODER_COUNTS / 64,
+  ENCODER_COUNTS / 72,
+  ENCODER_COUNTS / 128,
+  ENCODER_COUNTS / 288,
+  ENCODER_COUNTS / 486
+};
+
+// Default profile (0 = Arkanoid, 2 = Tempest recommended for most games)
+#define DEFAULT_PROFILE 4
+
+// Scroll wheel sensitivity (fixed, higher = less sensitive)
+#define SCROLL_SENSITIVITY 300
+
+// Response delay in ms
+#define RESPONSE_DELAY 10
 
 /////////////////////////////////////////////////////////////////
 
-// Pins used by encoder
-#define pinA 3
-#define pinB 2
-// Pins used by buttons
-#define Button0 5 // Left button B
-#define Button1 4 // Right button A
-#define Button2 14 // Start
-#define Button3 15 // Hotkey
-#define Button4 6 // Select
+// Encoder pins
+#define PIN_A 3
+#define PIN_B 2
 
-////////////////////////////////////////////////////////
+// Button pins
+#define BTN_B      5   // Left button
+#define BTN_A      4   // Right button
+#define BTN_START  14  // Start button
+#define BTN_HOTKEY 15  // Hotkey button
+#define BTN_SELECT 6   // Select button
+
+/////////////////////////////////////////////////////////////////
 
 #include <HID-Project.h>
-#define MOUSE_SIDE      (1 << 3)
-#define MOUSE_EXTRA     (1 << 4)
 
-// Default virtual spinner position
-int16_t drvpos = 0;
-// Default real spinner position
-int16_t r_drvpos = 0;
-// Default virtual mouse position
-int16_t m_drvpos = 0;
+// Mouse button definitions
+#define MOUSE_SIDE  (1 << 3)
+#define MOUSE_EXTRA (1 << 4)
 
-// Variables for paddle_emu
-#define SP_MAX ((SPINNER_PPR*4*270UL)/360)
-int32_t sp_clamp = SP_MAX/2;
+// Spinner state
+volatile int16_t spinnerPos = 0;
 
-// Response delay of the mouse, in ms
-int responseDelay = 10;
+// Current profile
+uint8_t currentProfile = DEFAULT_PROFILE;
+uint8_t currentSensitivity = MOUSE_SENSITIVITY[DEFAULT_PROFILE];
 
-// Interrupt pins of Rotary Encoder
-void drv_proc()
-{
-  static int8_t prev = drvpos;
-  int8_t a = digitalRead(pinA);
-  int8_t b = digitalRead(pinB);
-
-  int8_t spval = (b << 1) | (b^a);
-  int8_t diff = (prev - spval)&3;
-
-  if(diff == 1)
-  {
-    r_drvpos += 1;
-    if(sp_clamp < SP_MAX) sp_clamp++;
-  }
-  if(diff == 3)
-  {
-    r_drvpos -= 1;
-    if(sp_clamp > 0) sp_clamp--;
-  }
-
-  drvpos = r_drvpos / SPINNER_SENSITIVITY;
-  m_drvpos = r_drvpos / MOUSE_SENSITIVITY;
-  prev = spval;
+// Clamp value to int8 range
+inline int8_t clamp8(int16_t val) {
+  if (val > 127) return 127;
+  if (val < -127) return -127;
+  return val;
 }
 
-// Run at startup
-void setup()
-{
-  // Encoder
-  pinMode(pinA, INPUT_PULLUP);
-  pinMode(pinB, INPUT_PULLUP);
-  // Init encoder reading
-  drv_proc();
-  // Attach interrupt to each pin of the encoder
-  attachInterrupt(digitalPinToInterrupt(pinA), drv_proc, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(pinB), drv_proc, CHANGE);
+// Encoder interrupt handler
+void encoderISR() {
+  static uint8_t prev = 0;
+  uint8_t a = digitalRead(PIN_A);
+  uint8_t b = digitalRead(PIN_B);
 
-  // Initialize Button Pins
-  pinMode(Button0, INPUT_PULLUP);
-  pinMode(Button1, INPUT_PULLUP);
-  pinMode(Button2, INPUT_PULLUP);
-  pinMode(Button3, INPUT_PULLUP);
-  pinMode(Button4, INPUT_PULLUP);
+  uint8_t curr = (b << 1) | (b ^ a);
+  int8_t diff = (prev - curr) & 3;
+
+  if (diff == 1) spinnerPos++;
+  else if (diff == 3) spinnerPos--;
+
+  prev = curr;
 }
 
-// Main loop
-void loop()
-{
+void setup() {
+  // Encoder pins
+  pinMode(PIN_A, INPUT_PULLUP);
+  pinMode(PIN_B, INPUT_PULLUP);
 
-  struct ButtonMapper
-  {
-    int mButton;
-    int mMouseButton;
-  };
+  // Button pins
+  pinMode(BTN_A, INPUT_PULLUP);
+  pinMode(BTN_B, INPUT_PULLUP);
+  pinMode(BTN_START, INPUT_PULLUP);
+  pinMode(BTN_HOTKEY, INPUT_PULLUP);
+  pinMode(BTN_SELECT, INPUT_PULLUP);
 
-  static const ButtonMapper buttonsToMouseButtons[] =
-  {
-    { Button0, MOUSE_LEFT },
-    { Button1, MOUSE_RIGHT },
-    { Button2, MOUSE_MIDDLE },
-    { Button3, MOUSE_EXTRA },
-    { Button4, MOUSE_SIDE },
-  };
+  // Attach encoder interrupts
+  attachInterrupt(digitalPinToInterrupt(PIN_A), encoderISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_B), encoderISR, CHANGE);
+}
 
-  for(const ButtonMapper& mapper : buttonsToMouseButtons)
-  {
-    if (!digitalRead(mapper.mButton) == HIGH)
-    {
-      if (!Mouse.isPressed(mapper.mMouseButton)) Mouse.press(mapper.mMouseButton);
+void loop() {
+  static bool prevBtnA = false;
+  static bool prevBtnB = false;
+  static int16_t prevMousePos = 0;
+  static int16_t prevScrollPos = 0;
+
+  // Read buttons
+  bool hotkey = !digitalRead(BTN_HOTKEY);
+  bool btnA = !digitalRead(BTN_A);
+  bool btnB = !digitalRead(BTN_B);
+
+  // Profile switching (Hotkey + A/B)
+  // Hotkey + A = next profile (less sensitive / slower)
+  // Hotkey + B = previous profile (more sensitive / faster)
+  if (hotkey) {
+    if (btnA && !prevBtnA && currentProfile < NUM_PROFILES - 1) {
+      currentProfile++;
+      currentSensitivity = MOUSE_SENSITIVITY[currentProfile];
     }
-    else if (Mouse.isPressed(mapper.mMouseButton)) Mouse.release(mapper.mMouseButton);
+    if (btnB && !prevBtnB && currentProfile > 0) {
+      currentProfile--;
+      currentSensitivity = MOUSE_SENSITIVITY[currentProfile];
+    }
+  }
+  prevBtnA = btnA;
+  prevBtnB = btnB;
+
+  // Handle mouse buttons
+  const uint8_t buttons[] = {BTN_B, BTN_A, BTN_START, BTN_HOTKEY, BTN_SELECT};
+  const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_EXTRA, MOUSE_SIDE};
+
+  for (uint8_t i = 0; i < 5; i++) {
+    bool pressed = !digitalRead(buttons[i]);
+    if (pressed && !Mouse.isPressed(mouseButtons[i])) {
+      Mouse.press(mouseButtons[i]);
+    } else if (!pressed && Mouse.isPressed(mouseButtons[i])) {
+      Mouse.release(mouseButtons[i]);
+    }
   }
 
-  delay(responseDelay);
+  delay(RESPONSE_DELAY);
 
-  static uint16_t m_prev = 0;
-  int16_t val = ((int16_t)(m_drvpos - m_prev));
-  if(val>127) val = 127; else if(val<-127) val = -127;
-  m_prev += val;
-  Mouse.move(val, 0);
+  // Calculate mouse and scroll movement
+  int16_t pos = spinnerPos;  // Atomic read
+  int16_t mousePos = pos / currentSensitivity;
+  int16_t scrollPos = pos / SCROLL_SENSITIVITY;
+
+  int8_t mouseDelta = clamp8(mousePos - prevMousePos);
+  int8_t scrollDelta = clamp8(scrollPos - prevScrollPos);
+
+  prevMousePos += mouseDelta;
+  prevScrollPos += scrollDelta;
+
+  // Send mouse movement (horizontal + scroll inverted)
+  Mouse.move(mouseDelta, 0, -scrollDelta);
 }
