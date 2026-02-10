@@ -57,7 +57,7 @@ Encodeur    →    Arduino Pro Micro
 GND (fil noir)  →    GND
 VCC (fil rouge) →    VCC (bridger J1 pour 5V)
 A (fil blanc)   →    Pin 2 (GP_2)
-B (fil green)   →    Pin 3 (GP_3)
+B (fil vert)   →    Pin 3 (GP_3)
 ```
 ![Pinout Rotary](img/rotary.jpg)
 

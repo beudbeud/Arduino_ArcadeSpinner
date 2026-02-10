@@ -66,7 +66,7 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
   ENCODER_COUNTS / 486
 };
 
-// Default profile (0 = Arkanoid, 2 = Tempest recommended for most games)
+// Default profile (4 = Arkanoid, 1 = Tempest recommended for most games)
 #define DEFAULT_PROFILE 4
 
 // Scroll wheel sensitivity (fixed, higher = less sensitive)
