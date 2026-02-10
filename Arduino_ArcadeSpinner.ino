@@ -70,7 +70,7 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
 #define DEFAULT_PROFILE 4
 
 // Scroll wheel sensitivity (fixed, higher = less sensitive)
-#define SCROLL_SENSITIVITY 300
+#define SCROLL_SENSITIVITY 400
 
 // Response delay in ms
 #define RESPONSE_DELAY 10
@@ -81,8 +81,8 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
 /////////////////////////////////////////////////////////////////
 
 // Encoder pins
-#define PIN_A 3
-#define PIN_B 2
+#define PIN_A 2
+#define PIN_B 3
 
 // Button pins
 #define BTN_B      5   // Left button
@@ -235,5 +235,5 @@ void loop() {
   prevScrollPos += scrollDelta;
 
   // Send mouse movement (horizontal + scroll inverted)
-  Mouse.move(mouseDelta, 0, -scrollDelta);
+  Mouse.move(-mouseDelta, 0, scrollDelta);
 }
