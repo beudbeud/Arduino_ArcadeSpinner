@@ -68,8 +68,8 @@ Fonction          →    Pin Arduino
 Button0 (B)      →    Pin 5 (GP_5)   
 Button1 (A)      →    Pin 4 (GP_4)   
 Button4 (Select) →    Pin 6 (GP_6)   
-Button3 (Hotkey) →    Pin 15 (GP_15) 
 Button2 (Start)  →    Pin 14 (GP_14) 
+Button3 (Hotkey) →    Pin 15 (GP_15) 
 ```
 **Schéma de connexion des boutons :**
 ```
