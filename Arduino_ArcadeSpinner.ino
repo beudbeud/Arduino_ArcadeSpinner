@@ -204,27 +204,21 @@ void loop() {
   prevBtnA = btnA;
   prevBtnB = btnB;
 
+  const uint8_t buttons[] = {BTN_B, BTN_A, BTN_SELECT, BTN_START, BTN_HOTKEY};
+  const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_SIDE, MOUSE_EXTRA, MOUSE_MIDDLE};
+
   // Blink LEDs if profile changed
   if (profileChanged) {
     blinkProfile(currentProfile);
   }
 
-  // Handle mouse buttons (skip if hotkey is pressed to avoid accidental clicks)
-  if (!hotkey) {
-    const uint8_t buttons[] = {BTN_B, BTN_A, BTN_SELECT, BTN_START};
-    const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_SIDE, MOUSE_EXTRA};
-
-    for (uint8_t i = 0; i < 4; i++) {
-      bool pressed = !digitalRead(buttons[i]);
-      if (pressed && !Mouse.isPressed(mouseButtons[i])) {
-        Mouse.press(mouseButtons[i]);
-      } else if (!pressed && Mouse.isPressed(mouseButtons[i])) {
-        Mouse.release(mouseButtons[i]);
-      }
+  for (uint8_t i = 0; i < 5; i++) {
+    bool pressed = !digitalRead(buttons[i]);
+    if (pressed && !Mouse.isPressed(mouseButtons[i])) {
+      Mouse.press(mouseButtons[i]);
+    } else if (!pressed && Mouse.isPressed(mouseButtons[i])) {
+      Mouse.release(mouseButtons[i]);
     }
-  } else {
-    // Release all mouse buttons when hotkey is pressed
-    Mouse.releaseAll();
   }
 
   delay(RESPONSE_DELAY);
