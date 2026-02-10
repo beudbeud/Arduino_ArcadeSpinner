@@ -170,8 +170,8 @@ void loop() {
   prevBtnB = btnB;
 
   // Handle mouse buttons
-  const uint8_t buttons[] = {BTN_B, BTN_A, BTN_START, BTN_HOTKEY, BTN_SELECT};
-  const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_EXTRA, MOUSE_SIDE};
+  const uint8_t buttons[] = {BTN_B, BTN_A, BTN_SELECT, BTN_START, BTN_HOTKEY};
+  const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_SIDE, MOUSE_EXTRA, MOUSE_MIDDLE};
 
   for (uint8_t i = 0; i < 5; i++) {
     bool pressed = !digitalRead(buttons[i]);
