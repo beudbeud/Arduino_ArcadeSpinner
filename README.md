@@ -30,7 +30,7 @@ Par défaut, l'appareil fonctionne comme un contrôleur à 5 boutons avec spinne
 | Boutons 30mm | Standard arcade | 2 |
 | Boîtier | Imprimé 3D ou boîte quelconque | 1 |
 | Câbles | Dupont ou fils de connexion | - |
-| Boitier | [Impression 3D](3D Files/) | - |
+| Boitier | [Impression 3D](https://github.com/beudbeud/Arduino_ArcadeSpinner/blob/main/3D%20Files/readme.md) | - |
 
 
 **Où acheter :**
