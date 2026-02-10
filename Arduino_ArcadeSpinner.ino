@@ -75,6 +75,9 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
 // Response delay in ms
 #define RESPONSE_DELAY 10
 
+// LED feedback duration in ms
+#define LED_BLINK_TIME 80
+
 /////////////////////////////////////////////////////////////////
 
 // Encoder pins
@@ -87,6 +90,9 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
 #define BTN_START  14  // Start button
 #define BTN_HOTKEY 15  // Hotkey button
 #define BTN_SELECT 6   // Select button
+
+// Pro Micro onboard LEDs
+#define LED_RX 17  // RX LED pin
 
 /////////////////////////////////////////////////////////////////
 
@@ -108,6 +114,22 @@ inline int8_t clamp8(int16_t val) {
   if (val > 127) return 127;
   if (val < -127) return -127;
   return val;
+}
+
+// Blink LEDs to indicate current profile
+// Blinks (profile + 1) times: Profile 0 = 1 blink, Profile 4 = 5 blinks
+void blinkProfile(uint8_t profile) {
+  for (uint8_t i = 0; i <= profile; i++) {
+    // Turn ON both LEDs (active LOW)
+    digitalWrite(LED_RX, LOW);
+    TXLED1;
+    delay(LED_BLINK_TIME);
+
+    // Turn OFF both LEDs
+    digitalWrite(LED_RX, HIGH);
+    TXLED0;
+    delay(LED_BLINK_TIME);
+  }
 }
 
 // Encoder interrupt handler
@@ -137,9 +159,18 @@ void setup() {
   pinMode(BTN_HOTKEY, INPUT_PULLUP);
   pinMode(BTN_SELECT, INPUT_PULLUP);
 
+  // LED pins
+  pinMode(LED_RX, OUTPUT);
+  digitalWrite(LED_RX, HIGH);  // OFF (active LOW)
+  TXLED0;  // OFF
+
   // Attach encoder interrupts
   attachInterrupt(digitalPinToInterrupt(PIN_A), encoderISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_B), encoderISR, CHANGE);
+
+  // Blink current profile on startup
+  delay(500);
+  blinkProfile(currentProfile);
 }
 
 void loop() {
@@ -154,32 +185,46 @@ void loop() {
   bool btnB = !digitalRead(BTN_B);
 
   // Profile switching (Hotkey + A/B)
-  // Hotkey + A = next profile (less sensitive / slower)
-  // Hotkey + B = previous profile (more sensitive / faster)
+  // Hotkey + A = next profile (more sensitive)
+  // Hotkey + B = previous profile (less sensitive)
+  bool profileChanged = false;
+
   if (hotkey) {
     if (btnA && !prevBtnA && currentProfile < NUM_PROFILES - 1) {
       currentProfile++;
       currentSensitivity = MOUSE_SENSITIVITY[currentProfile];
+      profileChanged = true;
     }
     if (btnB && !prevBtnB && currentProfile > 0) {
       currentProfile--;
       currentSensitivity = MOUSE_SENSITIVITY[currentProfile];
+      profileChanged = true;
     }
   }
   prevBtnA = btnA;
   prevBtnB = btnB;
 
-  // Handle mouse buttons
-  const uint8_t buttons[] = {BTN_B, BTN_A, BTN_SELECT, BTN_START, BTN_HOTKEY};
-  const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_SIDE, MOUSE_EXTRA, MOUSE_MIDDLE};
+  // Blink LEDs if profile changed
+  if (profileChanged) {
+    blinkProfile(currentProfile);
+  }
 
-  for (uint8_t i = 0; i < 5; i++) {
-    bool pressed = !digitalRead(buttons[i]);
-    if (pressed && !Mouse.isPressed(mouseButtons[i])) {
-      Mouse.press(mouseButtons[i]);
-    } else if (!pressed && Mouse.isPressed(mouseButtons[i])) {
-      Mouse.release(mouseButtons[i]);
+  // Handle mouse buttons (skip if hotkey is pressed to avoid accidental clicks)
+  if (!hotkey) {
+    const uint8_t buttons[] = {BTN_B, BTN_A, BTN_SELECT, BTN_START};
+    const uint8_t mouseButtons[] = {MOUSE_LEFT, MOUSE_RIGHT, MOUSE_SIDE, MOUSE_EXTRA};
+
+    for (uint8_t i = 0; i < 4; i++) {
+      bool pressed = !digitalRead(buttons[i]);
+      if (pressed && !Mouse.isPressed(mouseButtons[i])) {
+        Mouse.press(mouseButtons[i]);
+      } else if (!pressed && Mouse.isPressed(mouseButtons[i])) {
+        Mouse.release(mouseButtons[i]);
+      }
     }
+  } else {
+    // Release all mouse buttons when hotkey is pressed
+    Mouse.releaseAll();
   }
 
   delay(RESPONSE_DELAY);
