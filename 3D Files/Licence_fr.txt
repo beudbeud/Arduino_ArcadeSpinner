@@ -1,0 +1,23 @@
+=====================================================
+ARCADE SPINNER CASE - CONDITIONS D'UTILISATION
+=====================================================
+
+AUTEUR : Benoit BOUNAR (Bounitos)
+
+LIEN PROJET : 
+Ce modèle est optimisé pour le projet de spinner 
+https://github.com/beudbeud/Arduino_ArcadeSpinner/tree/main
+
+LICENCE : CC BY-NC-SA 4.0
+
+CLAUSES JURIDIQUES :
+1. USAGE : Modèle réservé exclusivement à un usage personnel et privé.
+2. RESTRICTION COMMERCIALE : L'exploitation commerciale (vente du fichier 
+   ou de l'objet imprimé) est strictement interdite sans accord écrit.
+3. MODIFICATIONS : Les variantes sont autorisées sous réserve de partage
+   selon les mêmes conditions de licence.
+4. ATTRIBUTION : Mention obligatoire de l'auteur original (Benoit BOUNAR)
+   sur toute plateforme de partage ou exposition du projet.
+5. RESPONSABILITE : L'auteur décline toute responsabilité quant à l'usage
+   physique du modèle ou d'éventuels défauts d'impression.
+=====================================================

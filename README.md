@@ -30,6 +30,7 @@ Par défaut, l'appareil fonctionne comme un contrôleur à 5 boutons avec spinne
 | Boutons 30mm | Standard arcade | 2 |
 | Boîtier | Imprimé 3D ou boîte quelconque | 1 |
 | Câbles | Dupont ou fils de connexion | - |
+| Boitier | [Impression 3D](3D Files/) | - |
 
 
 **Où acheter :**
@@ -112,6 +113,7 @@ Ce projet est sous licence GNU General Public License v3.0.
 
 Basé sur les travaux de :
 - Adrien Beudin ([beudbeud](https://github.com/beudbeud))
+- Benoit BOUNAR (Bounitos) pour le boitier
 - Alexey Melnikov ([MiSTer-devel](https://github.com/MiSTer-devel))
 - Mikael Norrgård (mick@daemonbite.com)
 - [willoucom](https://github.com/willoucom/Arduino_ArcadeSpinner)
