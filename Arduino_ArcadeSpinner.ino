@@ -77,6 +77,10 @@ const uint16_t GAME_PPR[] = {
 // Response delay in ms (lower = more responsive, 1-2ms recommended)
 #define RESPONSE_DELAY 1
 
+// Dead zone - ignores small movements (noise/vibration filtering)
+// 0 = disabled, 1-3 = recommended for filtering micro-movements
+#define DEAD_ZONE 1
+
 // LED feedback duration in ms
 #define LED_BLINK_TIME 80
 
@@ -244,6 +248,12 @@ void loop() {
 
   int8_t mouseDelta = clamp8(mousePos - prevMousePos);
   int8_t scrollDelta = clamp8(scrollPos - prevScrollPos);
+
+  // Apply dead zone - ignore small movements
+  #if DEAD_ZONE > 0
+    if (mouseDelta > -DEAD_ZONE && mouseDelta < DEAD_ZONE) mouseDelta = 0;
+    if (scrollDelta > -DEAD_ZONE && scrollDelta < DEAD_ZONE) scrollDelta = 0;
+  #endif
 
   prevMousePos += mouseDelta;
   prevScrollPos += scrollDelta;
