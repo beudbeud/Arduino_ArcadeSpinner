@@ -18,6 +18,18 @@ Par défaut, l'appareil fonctionne comme un contrôleur à 5 boutons avec spinne
 - 5 profiles de sensibilité ajustable via raccourcie
 - Compatibilité universelle (Windows, Linux, MacOS, RetroPie, MiSTer, etc.)
 
+### Changement de profile
+
+Il y a 5 profiles:
+
+ * Profile 0: Omega Race   - 64 PPR (Sega standard)
+ * Profile 1: Tempest      - 72 PPR (Atari vector standard)
+ * Profile 2: Tron/DoT     - 128 PPR
+ * Profile 3: Blasteroids  - 288 PPR
+ * Profile 4: Arkanoid     - 486 PPR (très sensible)
+
+Par défaut au démarrage le spinner est configuré avec le profile 4. En jeux il est possible de changer le profile via le raccourci `Hotkey` + `B` pour diminer la sensibilité ou `Hotkey` + `A` pour augementer.
+
 ## Construire le vôtre
 
 ### Liste des composants

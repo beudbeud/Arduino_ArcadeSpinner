@@ -47,15 +47,6 @@
 
 #define NUM_PROFILES 5
 
-// Original game PPR values
-const uint16_t GAME_PPR[NUM_PROFILES] = {
-  64,
-  72,
-  128,
-  288,
-  486
-};
-
 // Pre-calculated sensitivity divisors: ENCODER_COUNTS / GAME_PPR
 // These values divide the raw encoder count to match original game feel
 const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
