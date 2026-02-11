@@ -35,45 +35,52 @@
 /*
  * Game Profiles - Based on original arcade hardware PPR
  *
- * Profile 0: Omega Race   - 64 PPR (Sega standard)
- * Profile 1: Tempest      - 72 PPR (Atari vector standard)
- * Profile 2: Tron/DoT     - 128 PPR
- * Profile 3: Blasteroids  - 288 PPR
- * Profile 4: Arkanoid     - 486 PPR (geared, very sensitive)
+ * Add, remove or modify profiles as needed!
+ * Just update GAME_PPR array and NUM_PROFILES will auto-calculate.
+ *
+ * Common arcade game PPR values:
+ *   64  - Omega Race, Tac/Scan, Zektor, Star Trek (Sega standard)
+ *   72  - Tempest, Super Sprint (Atari vector standard)
+ *   128 - Tron, Disks of Tron
+ *   144 - 720 Degrees
+ *   288 - Blasteroids
+ *   486 - Arkanoid, Puchi Carat (geared, very sensitive)
  *
  * Sensitivity = ENCODER_COUNTS / GAME_PPR
- * Lower value = more sensitive (fewer encoder counts per game unit)
+ * Lower PPR value = less sensitive, Higher PPR value = more sensitive
  */
 
-#define NUM_PROFILES 5
-
-// Pre-calculated sensitivity divisors: ENCODER_COUNTS / GAME_PPR
-// These values divide the raw encoder count to match original game feel
-const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
-  ENCODER_COUNTS / 64,
-  ENCODER_COUNTS / 72,
-  ENCODER_COUNTS / 128,
-  ENCODER_COUNTS / 288,
-  ENCODER_COUNTS / 486
+// ============== CUSTOMIZE YOUR PROFILES HERE ==============
+const uint16_t GAME_PPR[] = {
+  64,   // Profile 0: Omega Race / Sega
+  72,   // Profile 1: Tempest / Atari
+  128,  // Profile 2: Tron
+  288,  // Profile 3: Blasteroids
+  486   // Profile 4: Arkanoid / Puchi Carat
+  // Add more profiles here, e.g.:
+  // 144,  // Profile 5: 720 Degrees
+  // 100,  // Profile 6: Custom
 };
+// ==========================================================
 
-// Default profile (4 = Arkanoid, 1 = Tempest recommended for most games)
+// Default profile index (0 = first profile in GAME_PPR array)
 #define DEFAULT_PROFILE 4
 
 // Sensitivity multiplier (adjusts speed on top of PPR profile)
-// 1.0 = normal, 0.5 = slower/more precise, 2.0 = faster
-#define SENSITIVITY_MULTIPLIER 0.5
+// 5 = slower/more precise (0.5x), 10 = normal (1.0x), 20 = faster (2.0x)
+// Using integer to avoid float operations in main loop
+#define SENSITIVITY_MULTIPLIER 5
 
 // Scroll wheel sensitivity (fixed, higher = less sensitive)
 #define SCROLL_SENSITIVITY 400
 
-// Response delay in ms
-#define RESPONSE_DELAY 10
+// Response delay in ms (lower = more responsive, 1-2ms recommended)
+#define RESPONSE_DELAY 1
 
 // LED feedback duration in ms
 #define LED_BLINK_TIME 80
 
-/////////////////////////////////////////////////////////////////
+////////////////////// Don't Touche after that //////////////////
 
 // Encoder pins
 #define PIN_A 2
@@ -89,7 +96,10 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
 // Pro Micro onboard LEDs
 #define LED_RX 17  // RX LED pin
 
-/////////////////////////////////////////////////////////////////
+#define SENSITIVITY_DIVISOR 10
+
+// Auto-calculate number of profiles from array size
+#define NUM_PROFILES (sizeof(GAME_PPR) / sizeof(GAME_PPR[0]))
 
 #include <HID-Project.h>
 
@@ -102,7 +112,11 @@ volatile int16_t spinnerPos = 0;
 
 // Current profile
 uint8_t currentProfile = DEFAULT_PROFILE;
-uint8_t currentSensitivity = MOUSE_SENSITIVITY[DEFAULT_PROFILE];
+uint16_t currentPPR = GAME_PPR[DEFAULT_PROFILE];
+
+// Calculate sensitivity from PPR (inline function for efficiency)
+inline uint8_t getSensitivity(uint16_t ppr) {  return ENCODER_COUNTS / ppr;
+}
 
 // Clamp value to int8 range
 inline int8_t clamp8(int16_t val) {
@@ -127,11 +141,15 @@ void blinkProfile(uint8_t profile) {
   }
 }
 
-// Encoder interrupt handler
+// Encoder interrupt handler (optimized with direct port reading)
 void encoderISR() {
   static uint8_t prev = 0;
-  uint8_t a = digitalRead(PIN_A);
-  uint8_t b = digitalRead(PIN_B);
+
+  // Direct port reading - much faster than digitalRead()
+  // PIN_A = 2 = PD1, PIN_B = 3 = PD0 on Pro Micro
+  uint8_t portD = PIND;
+  uint8_t a = (portD >> 1) & 1;  // PD1 (pin 2)
+  uint8_t b = portD & 1;          // PD0 (pin 3)
 
   uint8_t curr = (b << 1) | (b ^ a);
   int8_t diff = (prev - curr) & 3;
@@ -187,12 +205,12 @@ void loop() {
   if (hotkey) {
     if (btnA && !prevBtnA && currentProfile < NUM_PROFILES - 1) {
       currentProfile++;
-      currentSensitivity = MOUSE_SENSITIVITY[currentProfile];
+      currentPPR = GAME_PPR[currentProfile];
       profileChanged = true;
     }
     if (btnB && !prevBtnB && currentProfile > 0) {
       currentProfile--;
-      currentSensitivity = MOUSE_SENSITIVITY[currentProfile];
+      currentPPR = GAME_PPR[currentProfile];
       profileChanged = true;
     }
   }
@@ -218,9 +236,10 @@ void loop() {
 
   delay(RESPONSE_DELAY);
 
-  // Calculate mouse and scroll movement
+  // Calculate mouse and scroll movement (optimized integer math)
   int16_t pos = spinnerPos;  // Atomic read
-  int16_t mousePos = (int16_t)((pos / currentSensitivity) * SENSITIVITY_MULTIPLIER);
+  uint8_t currentSensitivity = getSensitivity(currentPPR);
+  int16_t mousePos = (pos * SENSITIVITY_MULTIPLIER) / (currentSensitivity * SENSITIVITY_DIVISOR);
   int16_t scrollPos = pos / SCROLL_SENSITIVITY;
 
   int8_t mouseDelta = clamp8(mousePos - prevMousePos);
