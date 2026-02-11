@@ -118,6 +118,31 @@ Relier toutes les masses → GND
 3. Cliquer sur **Téléverser** (flèche →)
 4. Attendre la compilation et le téléversement
 
+## Options de personnalisation du code
+
+Tous les paramètres ajustables se trouvent en haut du fichier `Arduino_ArcadeSpinner.ino` :
+
+| Paramètre | Défaut | Description |
+|-----------|--------|-------------|
+| `ENCODER_PPR` | 600 | PPR de votre encodeur (300, 360, 400, 600...) |
+| `GAME_PPR[]` | 5 profils | Tableau des profils de sensibilité (modifiable/extensible) |
+| `DEFAULT_PROFILE` | 4 | Profil au démarrage (index du tableau, 0 = premier) |
+| `SENSITIVITY_MULTIPLIER` | 5 | Vitesse globale : 5 = précis, 10 = normal, 20 = rapide |
+| `SCROLL_SENSITIVITY` | 400 | Sensibilité molette (↑ = moins sensible) |
+| `RESPONSE_DELAY` | 1 | Délai en ms (1-2 recommandé) |
+| `DEAD_ZONE` | 1 | Filtrage vibrations : 0 = off, 1-3 = recommandé |
+| `LED_BLINK_TIME` | 80 | Durée clignotement LED (ms) |
+
+### Profils de jeux (valeurs PPR arcade)
+
+```
+64  → Omega Race, Tac/Scan (Sega)    288 → Blasteroids
+72  → Tempest, Super Sprint (Atari)  486 → Arkanoid, Puchi Carat
+128 → Tron, Disks of Tron            144 → 720 Degrees
+```
+
+Pour ajouter un profil, ajoutez simplement une valeur au tableau `GAME_PPR[]`.
+
 ## Licence
 
 Ce projet est sous licence GNU General Public License v3.0.
