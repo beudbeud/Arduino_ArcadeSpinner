@@ -81,6 +81,14 @@ const uint16_t GAME_PPR[] = {
 // 0 = disabled, 1-3 = recommended for filtering micro-movements
 #define DEAD_ZONE 1
 
+// Acceleration curve - slow movements stay precise, fast movements are amplified
+// 0 = disabled (linear), 1 = mild, 2 = medium, 3 = strong
+#define ACCELERATION_CURVE 2
+
+// Acceleration threshold - movements at or below this value are NOT accelerated
+// This preserves precision for slow/careful movements
+#define ACCEL_THRESHOLD 2
+
 // LED feedback duration in ms
 #define LED_BLINK_TIME 80
 
@@ -127,6 +135,31 @@ inline int8_t clamp8(int16_t val) {
   if (val > 127) return 127;
   if (val < -127) return -127;
   return val;
+}
+
+// Apply acceleration curve - only affects OUTPUT, not position tracking
+// Returns accelerated value for Mouse.move() only
+inline int8_t applyAcceleration(int8_t delta) {
+  #if ACCELERATION_CURVE > 0
+    if (delta == 0) return 0;
+
+    int8_t absDelta = (delta > 0) ? delta : -delta;
+
+    // Below or equal threshold: no acceleration (precision preserved)
+    if (absDelta <= ACCEL_THRESHOLD) return delta;
+
+    // Above threshold: apply acceleration
+    // Multiplier: 1=1.5x, 2=2x, 3=2.5x for the part above threshold
+    int8_t excess = absDelta - ACCEL_THRESHOLD;
+    int8_t acceleratedExcess = (excess * (10 + ACCELERATION_CURVE * 5)) / 10;
+    int8_t result = ACCEL_THRESHOLD + acceleratedExcess;
+
+    // Clamp and restore sign
+    if (result > 127) result = 127;
+    return (delta > 0) ? result : -result;
+  #else
+    return delta;
+  #endif
 }
 
 // Blink LEDs to indicate current profile
@@ -255,9 +288,13 @@ void loop() {
     if (scrollDelta > -DEAD_ZONE && scrollDelta < DEAD_ZONE) scrollDelta = 0;
   #endif
 
+  // Update position tracking BEFORE acceleration (keeps tracking accurate)
   prevMousePos += mouseDelta;
   prevScrollPos += scrollDelta;
 
+  // Apply acceleration ONLY to output (not to position tracking)
+  int8_t outputDelta = applyAcceleration(mouseDelta);
+
   // Send mouse movement (horizontal + scroll inverted)
-  Mouse.move(-mouseDelta, 0, scrollDelta);
+  Mouse.move(-outputDelta, 0, scrollDelta);
 }

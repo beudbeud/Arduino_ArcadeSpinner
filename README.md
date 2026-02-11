@@ -132,6 +132,8 @@ Tous les paramètres ajustables se trouvent en haut du fichier `Arduino_ArcadeSp
 | `RESPONSE_DELAY` | 1 | Délai en ms (1-2 recommandé) |
 | `DEAD_ZONE` | 1 | Filtrage vibrations : 0 = off, 1-3 = recommandé |
 | `LED_BLINK_TIME` | 80 | Durée clignotement LED (ms) |
+| `ACCELERATION_CURVE | 2 | 0=off, 1=léger, 2=moyen, 3=fort |
+| `ACCEL_THRESHOLD` | 2 | Mouvements ≤2 = pas accélérés |
 
 ### Profils de jeux (valeurs PPR arcade)
 
