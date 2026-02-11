@@ -15,7 +15,7 @@ Par défaut, l'appareil fonctionne comme un contrôleur à 5 boutons avec spinne
 **Fonctionnalités :**
 - Spinner haute précision (600 PPR par défaut)
 - 5 boutons mappés sur les boutons de souris (gauche, droit, milieu, latéral, extra)
-- Sensibilité ajustable via le code
+- 5 profiles de sensibilité ajustable via raccourcie
 - Compatibilité universelle (Windows, Linux, MacOS, RetroPie, MiSTer, etc.)
 
 ## Construire le vôtre
@@ -28,9 +28,8 @@ Par défaut, l'appareil fonctionne comme un contrôleur à 5 boutons avec spinne
 | Microcontrôleur | Arduino | 1 |
 | Boutons 24mm | Standard arcade | 3 |
 | Boutons 30mm | Standard arcade | 2 |
-| Boîtier | Imprimé 3D ou boîte quelconque | 1 |
+| Boîtier | [Impression 3D](https://github.com/beudbeud/Arduino_ArcadeSpinner/tree/main/3D%20Files) ou boîte quelconque | 1 |
 | Câbles | Dupont ou fils de connexion | - |
-| Boitier | [Impression 3D](https://github.com/beudbeud/Arduino_ArcadeSpinner/tree/main/3D%20Files) | - |
 
 
 **Où acheter :**
