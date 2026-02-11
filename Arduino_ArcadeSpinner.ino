@@ -60,6 +60,10 @@ const uint8_t MOUSE_SENSITIVITY[NUM_PROFILES] = {
 // Default profile (4 = Arkanoid, 1 = Tempest recommended for most games)
 #define DEFAULT_PROFILE 4
 
+// Sensitivity multiplier (adjusts speed on top of PPR profile)
+// 1.0 = normal, 0.5 = slower/more precise, 2.0 = faster
+#define SENSITIVITY_MULTIPLIER 0.5
+
 // Scroll wheel sensitivity (fixed, higher = less sensitive)
 #define SCROLL_SENSITIVITY 400
 
@@ -216,7 +220,7 @@ void loop() {
 
   // Calculate mouse and scroll movement
   int16_t pos = spinnerPos;  // Atomic read
-  int16_t mousePos = pos / currentSensitivity;
+  int16_t mousePos = (int16_t)((pos / currentSensitivity) * SENSITIVITY_MULTIPLIER);
   int16_t scrollPos = pos / SCROLL_SENSITIVITY;
 
   int8_t mouseDelta = clamp8(mousePos - prevMousePos);
